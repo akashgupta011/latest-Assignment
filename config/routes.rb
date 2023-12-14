@@ -7,4 +7,8 @@ Rails.application.routes.draw do
   delete "/user/logout", to: "users#log_out"
   delete "/user/remove", to: "users#remove_user"
 
+  resources :posts do
+    resources :comments
+  end
+
 end
