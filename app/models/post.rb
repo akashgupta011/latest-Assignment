@@ -3,9 +3,11 @@ class Post < ApplicationRecord
   has_many :comments
   has_one_attached :image
 
+  self.per_page = 10
+  
   validates :title, presence: true
   validates :content, presence: true
   validates :author, presence: true
   validates :published_date, presence: true
-  self.per_page = 10
+
 end
