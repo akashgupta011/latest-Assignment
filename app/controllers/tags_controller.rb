@@ -1,5 +1,5 @@
 # app/controllers/api/tags_controller.rb
-class Api::TagsController < ApplicationController
+class TagsController < ApplicationController
   def index
     tags = Tag.all
     render json: tags
