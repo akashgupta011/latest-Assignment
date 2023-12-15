@@ -64,7 +64,7 @@ class UsersController < ApplicationController
 
   private
     def user_params
-      params.require(:user).permit(:username, :userbio, :email, :role, :token, :password)
+      params.require(:user).permit(:username, :userbio, :email, :token, :password).merge(Role: "user")
     end
 
     def set_authenticity

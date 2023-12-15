@@ -1,4 +1,9 @@
 class PostsController < ApplicationController
+  include Elasticsearch::Model
+  include Elasticsearch::Model::Callbacks
+
+  after_save { __elasticsearch__.index_document }
+
   before_action :set_post, only: [:show, :update, :destroy]
 
   def show
@@ -31,6 +36,23 @@ class PostsController < ApplicationController
     end
   end
 
+  def filter
+    if params[:category_id].present?
+      posts = Post.joins(:categories).where(categories: { id: params[:category_id] })
+    elsif params[:tag_id].present?
+      posts = Post.joins(:tags).where(tags: { id: params[:tag_id] })
+    else
+      posts = Post.all
+    end
+
+    render json: posts
+  end
+
+  def search
+    @posts = Post.search(params[:q])
+    render json: @posts
+  end
+  
   private
 
   def set_post

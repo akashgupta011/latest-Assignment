@@ -28,6 +28,9 @@ gem "activestorage"
 gem "will_paginate"
 gem 'carrierwave'
 gem 'mini_magick'
+gem 'elasticsearch-model'
+gem 'elasticsearch-rails'
+
 
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
