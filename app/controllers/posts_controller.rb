@@ -2,8 +2,6 @@ class PostsController < ApplicationController
   include Elasticsearch::Model
   include Elasticsearch::Model::Callbacks
 
-  after_save { __elasticsearch__.index_document }
-
   before_action :set_post, only: [:show, :update, :destroy]
 
   def show
@@ -48,11 +46,6 @@ class PostsController < ApplicationController
     render json: posts
   end
 
-  def search
-    @posts = Post.search(params[:q])
-    render json: @posts
-  end
-  
   private
 
   def set_post

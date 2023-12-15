@@ -14,9 +14,8 @@ Rails.application.routes.draw do
   get "post/filter", to: "posts#filter"
   get "post/search", to: "posts#search"
 
-  namespace :api do
-    resources :categories, only: [:index, :create]
-    resources :tags, only: [:index, :create]
-  end
+  
+  resources :categories, only: [:index, :create]
+  resources :tags, only: [:index, :create]
 
 end
