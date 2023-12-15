@@ -11,4 +11,9 @@ Rails.application.routes.draw do
     resources :comments
   end
 
+  namespace :api do
+    resources :categories, only: [:index, :create]
+    resources :tags, only: [:index, :create]
+  end
+
 end
