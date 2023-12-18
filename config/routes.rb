@@ -6,7 +6,7 @@ Rails.application.routes.draw do
   patch "/user/update", to: "users#update"
   delete "/user/logout", to: "users#log_out"
   delete "/user/remove", to: "users#remove_user"
-
+  
   resources :posts do
     resources :comments
   end

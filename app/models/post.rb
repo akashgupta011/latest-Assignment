@@ -1,7 +1,7 @@
 class Post < ApplicationRecord
   belongs_to :user
   
-  has_many :comments
+  has_many :comments, dependent: :destroy
   has_and_belongs_to_many :categories
   has_and_belongs_to_many :tags
   has_one_attached :image
@@ -15,6 +15,9 @@ class Post < ApplicationRecord
   validates :author, presence: true
   validates :published_date, presence: true
 
+  def image_url
+    Rails.application.routes.url_helpers.url_for(image) if image.attached?
+  end
   # def process_images
   #   return unless image.attached?
 
