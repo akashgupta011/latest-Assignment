@@ -6,6 +6,7 @@ Rails.application.routes.draw do
   patch "/user/update", to: "users#update"
   delete "/user/logout", to: "users#log_out"
   delete "/user/remove", to: "users#remove_user"
+  delete "/admin/delete/user/:id", to: "users#admin_remove"
   
   resources :posts do
     resources :comments
@@ -13,9 +14,5 @@ Rails.application.routes.draw do
 
   get "post/filter", to: "posts#filter"
   get "post/search", to: "posts#search"
-
-  
-  resources :categories, only: [:index, :create]
-  resources :tags, only: [:index, :create]
 
 end

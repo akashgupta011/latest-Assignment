@@ -21,7 +21,7 @@ class UsersController < ApplicationController
         token = User.generate_token(@user)
         response.headers['Authorization'] = "Bearer #{token}"
         @user.update(token: token)
-        render json: {message:"user #{@user.username} is created successfully"}
+        render json: {message:"#{@user.username} is loggedin as user successfully"}
       else
         render json: { error: 'Invalid email or password' }, status: :unauthorized
       end
@@ -30,10 +30,13 @@ class UsersController < ApplicationController
   end
 
   def show #show user profile
-    if @user
+    if @user.Role == "admin"
+      @users = User.all
+      render json: @users
+    elsif @user.Role == "user"
       render json: @user
     else
-      render :edit, status: :unprocessable_entity
+      render json: {messages: "user not found"}
     end
   end
 
@@ -59,6 +62,15 @@ class UsersController < ApplicationController
       render json:{messages:"user removed from this site successfully"}
     else
       render json:{messages:"user not removed"}
+    end
+  end
+
+  def admin_remove
+    user = User.find(params[:id])
+    if user.destroy
+      render json:{messages:"user removed from this site successfully by admin"}
+    else
+      render json:{messages:"there is issue that cause user not removed"}
     end
   end
 

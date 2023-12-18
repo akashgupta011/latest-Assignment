@@ -39,9 +39,9 @@ class PostsController < ApplicationController
   end
 
   def filter
-    if params[:category_id].present?
+    if params[:category].present?
       posts = Post.joins(:categories).where(categories: { id: params[:category_id] })
-    elsif params[:tag_id].present?
+    elsif params[:tag].present?
       posts = Post.joins(:tags).where(tags: { id: params[:tag_id] })
     elsif params[:title].present?
       posts = Post.joins(:title).where(title:{id:params[:title]})
