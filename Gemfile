@@ -25,6 +25,8 @@ gem "puma", "~> 5.0"
 gem "bcrypt", "~> 3.1.7"
 gem "jwt"
 gem "will_paginate"
+gem 'carrierwave'
+gem 'mini_magick'
 
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem

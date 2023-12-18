@@ -1,22 +1,20 @@
 class PostsController < ApplicationController
-  include Elasticsearch::Model
-  include Elasticsearch::Model::Callbacks
+  # include Elasticsearch::Model
+  # include Elasticsearch::Model::Callbacks
 
   before_action :set_post, only: [:show, :update, :destroy]
 
   def show
-    debugger
-    if @post.image?
-      render json: @post
-    end
+    render json: @post  
   end
 
   def create
     @user = authenticate_user
     @post = @user.posts.new(post_params)
-    # @post.image#(io: File.open('/home/blubirch/Pictures/image.png'), filename: 'image.png')
+    # debugger
+    # @post.image(io: File.open('/home/blubirch/Pictures/image.png'), filename: 'image.png')
     if @post.save 
-      render json: {messages: 'Post was successfully created.'}
+      render json: @post, include: [:image]
     else
       render json: {messages: 'something went wrong please check and try again'}
     end
@@ -39,12 +37,12 @@ class PostsController < ApplicationController
   end
 
   def filter
-    if params[:category].present?
-      posts = Post.joins(:categories).where(categories: { id: params[:category_id] })
+    if params[:Category].present?
+      posts = Post.find_by_Category(params[:Category])
     elsif params[:tag].present?
-      posts = Post.joins(:tags).where(tags: { id: params[:tag_id] })
-    elsif params[:title].present?
-      posts = Post.joins(:title).where(title:{id:params[:title]})
+      posts = Post.find_by_tag(params[:tag])
+    if params[:title].present?
+      posts = Post.find_by_title(params[:title])
     else
       posts = Post.all
     end
@@ -65,6 +63,6 @@ class PostsController < ApplicationController
   end
 
   def post_params
-    params.require(:post).permit(:title, :user_id, :content, :author, :published_date, :image).merge(category_ids: [1]).merge(tag_ids: [1])
+    params.require(:post).permit(:title, :content, :author, :published_date, :image, :Category, :tag).merge(user_id: authenticate_user.id)#.merge(tag_ids: [1])
   end
 end
