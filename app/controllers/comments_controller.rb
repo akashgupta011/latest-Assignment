@@ -4,7 +4,6 @@ class CommentsController < ApplicationController
   
   def create
     @comment = @post.comments.new(comments_params)
-    debugger
     if @comment.save
       render json: {messages:"comment created for post by user"}
     else
