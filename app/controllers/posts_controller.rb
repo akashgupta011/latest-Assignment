@@ -1,7 +1,4 @@
 class PostsController < ApplicationController
-  # include Elasticsearch::Model
-  # include Elasticsearch::Model::Callbacks
-
   before_action :set_post, only: [:show, :update, :destroy]
 
   def show
@@ -11,12 +8,10 @@ class PostsController < ApplicationController
   def create
     @user = authenticate_user
     @post = @user.posts.new(post_params)
-    # debugger
-    # @post.image(io: File.open('/home/blubirch/Pictures/image.png'), filename: 'image.png')
     if @post.save 
       render json: @post, include: [:image]
     else
-      render json: {messages: 'something went wrong please check and try again'}
+      render json: { messages: 'Something went wrong. Please check and try again.' }
     end
   end
 
@@ -24,32 +19,35 @@ class PostsController < ApplicationController
     if @post.update(post_params)
       render json: @post, notice: 'Post was successfully updated.'
     else
-      render json: {messages:"post not updated"}
+      render json: { messages: 'Post not updated.' }
     end
   end
 
   def destroy
     if @post.destroy
-      render json: {messages:"post deleted successfully"}
+      render json: { messages: 'Post deleted successfully.' }
     else
-      render json: {messages: 'Post was successfully not destroyed yet.'}
+      render json: { messages: 'Post was not destroyed yet.' }
     end
   end
 
   def filter
-    if params[:Category].present?
-      posts = Post.find_by_Category(params[:Category])
-    elsif params[:tag].present?
-      posts = Post.find_by_tag(params[:tag])
-    if params[:title].present?
-      posts = Post.find_by_title(params[:title])
-    else
-      posts = Post.all
-    end
+    posts = if params[:Category].present?
+              Post.where(Category: params[:Category])
+            elsif params[:tag].present?
+              Post.where(tag: params[:tag])
+            elsif params[:title].present?
+              Post.where(title: params[:title])
+            else
+              Post.all
+            end
 
     render json: posts
   end
-  
+
+  def search
+    # Your search logic here
+  end
 
   private
 
@@ -57,12 +55,12 @@ class PostsController < ApplicationController
     begin
       @user = authenticate_user
       @post = @user.posts.find(params[:id])
-    rescue
-      render json:{message:"no post available"}
+    rescue ActiveRecord::RecordNotFound
+      render json: { message: 'No post available with the given ID.' }, status: :not_found
     end
   end
 
   def post_params
-    params.require(:post).permit(:title, :content, :author, :published_date, :image, :Category, :tag).merge(user_id: authenticate_user.id)#.merge(tag_ids: [1])
+    params.require(:post).permit(:title, :content, :author, :Category, :tag, :published_date, :image).merge(user_id: authenticate_user.id)
   end
 end
