@@ -1,14 +1,32 @@
 class PostsController < ApplicationController
   before_action :set_post, only: [:show, :update, :destroy]
 
+  def index
+  @user = authenticate_user
+    if @user.role == "admin"
+      @posts = Post.all
+      render json: @posts
+    elsif @user.role == "user"
+      posts = @user.posts.all
+      render json: posts
+    end
+  end
+
   def show
-    render json: @post  
+    if @user.role == "admin"
+      @posts = Post.all
+      render json: @posts
+    elsif @user.role == "user"
+      render json: @post  
+    else
+      render json: {messages: "user role is undefined"}
+    end
   end
 
   def create
     @user = authenticate_user
     @post = @user.posts.new(post_params)
-    if @post.save 
+    if @post.save
       render json: @post, include: [:image]
     else
       render json: { messages: 'Something went wrong. Please check and try again.' }
@@ -28,6 +46,19 @@ class PostsController < ApplicationController
       render json: { messages: 'Post deleted successfully.' }
     else
       render json: { messages: 'Post was not destroyed yet.' }
+    end
+  end
+
+  def admin_remove
+    if @user.role == "admin"  
+      post = Post.find(params[:id])
+      if post.destroy
+        render json:{messages:"post removed from this site successfully by admin"}
+      else
+        render json:{messages:"there is issue that cause post not removed"}
+      end
+    else 
+      render json:{messages:"user is not admin"}
     end
   end
 
@@ -61,6 +92,6 @@ class PostsController < ApplicationController
   end
 
   def post_params
-    params.require(:post).permit(:title, :content, :author, :Category, :tag, :published_date, :image).merge(user_id: authenticate_user.id)
+    params.require(:post).permit(:title, :content, :published_date, :image, :author,category_ids: [],tag_ids: []).merge(user_id: authenticate_user.id)
   end
 end

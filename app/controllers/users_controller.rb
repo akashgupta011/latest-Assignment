@@ -21,7 +21,11 @@ class UsersController < ApplicationController
         token = User.generate_token(@user)
         response.headers['Authorization'] = "Bearer #{token}"
         @user.update(token: token)
-        render json: {message:"#{@user.username} is loggedin as user successfully"}
+        if @user.role == "admin"
+          render json: {message:"#{@user.username} is loggedin as admin successfully"} 
+        else
+          render json: {message:"#{@user.username} is loggedin as user successfully"}
+        end
       else
         render json: { error: 'Invalid email or password' }, status: :unauthorized
       end
@@ -30,10 +34,10 @@ class UsersController < ApplicationController
   end
 
   def show #show user profile
-    if @user.Role == "admin"
+    if @user.role == "admin"
       @users = User.all
       render json: @users
-    elsif @user.Role == "user"
+    elsif @user.role == "user"
       render json: @user
     else
       render json: {messages: "user not found"}
@@ -76,7 +80,7 @@ class UsersController < ApplicationController
 
   private
     def user_params
-      params.require(:user).permit(:username, :userbio, :email, :token, :password).merge(Role: "user")
+      params.require(:user).permit(:username, :userbio, :email, :token, :password).merge(role: "user")
     end
 
     def set_authenticity
