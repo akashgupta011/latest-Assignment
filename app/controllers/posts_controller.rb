@@ -1,8 +1,15 @@
+# PostsController
+# This controller manages posts. It includes actions for retrieving, creating, updating,
+# and deleting posts. Admin-specific actions are also available.
+
 class PostsController < ApplicationController
   before_action :set_post, only: [:show, :update, :destroy]
 
+  # GET /posts
+  # Returns a list of posts based on the user's role.
   def index
-  @user = authenticate_user
+    @user = authenticate_user
+
     if @user.role == "admin"
       @posts = Post.all
       render json: @posts
@@ -12,20 +19,26 @@ class PostsController < ApplicationController
     end
   end
 
+  # GET /posts/:id
+  # Returns details of a specific post based on the user's role.
   def show
     if @user.role == "admin"
       @posts = Post.all
       render json: @posts
     elsif @user.role == "user"
-      render json: @post  
+      render json: @post
     else
-      render json: {messages: "user role is undefined"}
+      render json: { messages: "user role is undefined" }
     end
   end
 
+  # POST /posts
+  # Creates a new post for the authenticated user.
+  # Returns a JSON response indicating whether the post was successfully created.
   def create
     @user = authenticate_user
     @post = @user.posts.new(post_params)
+
     if @post.save
       render json: @post, include: [:image]
     else
@@ -33,6 +46,9 @@ class PostsController < ApplicationController
     end
   end
 
+  # PATCH/PUT /posts/:id
+  # Updates an existing post based on the provided parameters.
+  # Returns a JSON response indicating whether the post was successfully updated.
   def update
     if @post.update(post_params)
       render json: @post, notice: 'Post was successfully updated.'
@@ -41,6 +57,9 @@ class PostsController < ApplicationController
     end
   end
 
+  # DELETE /posts/:id
+  # Deletes a specific post.
+  # Returns a JSON response indicating whether the post was successfully deleted.
   def destroy
     if @post.destroy
       render json: { messages: 'Post deleted successfully.' }
@@ -49,24 +68,30 @@ class PostsController < ApplicationController
     end
   end
 
+  # DELETE /posts/admin_remove/:id
+  # Admin-only action to remove a post from the site.
+  # Returns a JSON response indicating whether the post was successfully removed.
   def admin_remove
-    if @user.role == "admin"  
+    if @user.role == "admin"
       post = Post.find(params[:id])
+
       if post.destroy
-        render json:{messages:"post removed from this site successfully by admin"}
+        render json: { messages: 'Post removed from this site successfully by admin' }
       else
-        render json:{messages:"there is issue that cause post not removed"}
+        render json: { messages: 'There is an issue that caused the post not to be removed' }
       end
-    else 
-      render json:{messages:"user is not admin"}
+    else
+      render json: { messages: 'User is not admin' }
     end
   end
 
+  # GET /posts/filter
+  # Filters posts based on specified parameters such as category_ids, tag_ids, or title.
   def filter
-    posts = if params[:Category].present?
-              Post.where(Category: params[:Category])
-            elsif params[:tag].present?
-              Post.where(tag: params[:tag])
+    posts = if params[:category_ids].present?
+              Post.where(category_ids: params[:category_ids])
+            elsif params[:tag_ids].present?
+              Post.where(tag_ids: params[:tag_ids])
             elsif params[:title].present?
               Post.where(title: params[:title])
             else
@@ -76,12 +101,16 @@ class PostsController < ApplicationController
     render json: posts
   end
 
+  # GET /posts/search
+  # Placeholder for search logic (to be implemented).
   def search
     # Your search logic here
   end
 
   private
 
+  # Private: Sets the @post instance variable based on the id parameter.
+  # Renders a JSON response if an error occurs during the process.
   def set_post
     begin
       @user = authenticate_user
@@ -91,7 +120,8 @@ class PostsController < ApplicationController
     end
   end
 
+  # Private: Strong parameters for the 'post' model.
   def post_params
-    params.require(:post).permit(:title, :content, :published_date, :image, :author,category_ids: [],tag_ids: []).merge(user_id: authenticate_user.id)
+    params.require(:post).permit(:title, :content, :published_date, :image, :author, category_ids: [], tag_ids: []).merge(user_id: authenticate_user.id)
   end
 end
