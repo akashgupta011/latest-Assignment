@@ -4,6 +4,7 @@
 Rails.application.routes.draw do
   # User routes
   get "/user/show", to: "users#show"
+  get "/users/filter", to: "users#filter"
   post "/users/register", to: "users#registration"
   post "/users", to: "users#login"
   patch "/user/update", to: "users#update"

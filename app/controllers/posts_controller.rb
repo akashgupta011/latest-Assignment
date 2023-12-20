@@ -104,8 +104,17 @@ class PostsController < ApplicationController
   # GET /posts/search
   # Placeholder for search logic (to be implemented).
   def search
-    # Your search logic here
+    if params[:query].present?
+      @posts = Post.search(params[:query])
+    else
+      @posts = Post.all
+    end
+
+    render json: @posts
   end
+  #   # Process the results and return them to the user
+  #   return results
+  # end
 
   private
 

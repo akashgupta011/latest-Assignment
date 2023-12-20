@@ -101,6 +101,20 @@ class UsersController < ApplicationController
     end
   end
 
+  def filter
+    users = if params[:username].present?
+              User.where(username: params[:username])
+            elsif params[:userbio].present?
+              User.where(userbio: params[:userbio])
+            elsif params[:email].present?
+              User.where(email: params[:email])
+            else
+              User.all
+            end
+
+    render json: users
+  end
+
   private
 
   # Private: Strong parameters for the 'user' model.

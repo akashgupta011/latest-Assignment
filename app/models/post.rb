@@ -4,6 +4,10 @@
 # required attributes and handles image processing.
 
 class Post < ApplicationRecord
+
+  include Elasticsearch::Model
+  include Elasticsearch::Model::Callbacks
+  
   # Associations
   belongs_to :user
   has_many :comments, dependent: :destroy
@@ -31,6 +35,16 @@ class Post < ApplicationRecord
   # Returns a String containing the image URL or nil if no image is attached.
   def image_url
     Rails.application.routes.url_helpers.url_for(image) if image.attached?
+  end
+
+  mapping do
+    indexes :title, type: 'text'
+    indexes :content, type: 'text'
+    # Add more indexes for categories and tags as needed
+  end
+
+  def as_indexed_json(_options = {})
+    as_json(only: %w[title content])
   end
 
   private
