@@ -47,6 +47,12 @@ class Post < ApplicationRecord
     as_json(only: %w[title content])
   end
 
+  # Ensure the Elasticsearch index exists before importing
+  Post.__elasticsearch__.create_index! force: true
+
+  # Index the existing data after the index is created
+  Post.import
+
   private
 
   # Private: Process images after saving the post.
