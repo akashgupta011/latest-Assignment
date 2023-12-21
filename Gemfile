@@ -23,16 +23,38 @@ gem "puma", "~> 5.0"
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 gem "bcrypt", "~> 3.1.7"
+
+# JSON Web Token (JWT) implementation for Ruby
 gem "jwt"
+
+# Pagination library for Rails applications
 gem "will_paginate"
+
+# A file upload library for Ruby on Rails
 gem 'carrierwave'
+
+# MiniMagick is a Ruby wrapper for the ImageMagick or GraphicsMagick command-line tool
 gem 'mini_magick'
+
+# Full-text search engine and analytics for Ruby on Rails
 gem "searchkick"
+
+# Ruby integration with Elasticsearch, a distributed, RESTful search and analytics engine
 gem "elasticsearch"
+
+# Support for attaching files to ActiveRecord models
 gem "activestorage"
+
+# Elasticsearch integration for Ruby models
 gem 'elasticsearch-model'
+
+# Elasticsearch integration for Ruby on Rails
 gem 'elasticsearch-rails'
+
+# A Ruby gem that provides a simple and clean way to define cron jobs in Ruby
 gem 'whenever', require: false
+
+# Simple, efficient background processing for Ruby
 gem 'sidekiq'
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem

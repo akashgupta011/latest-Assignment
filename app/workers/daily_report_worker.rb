@@ -1,6 +1,9 @@
+# app/workers/daily_report_worker.rb
+
 class DailyReportWorker
   include Sidekiq::Worker
 
+  # Perform the daily report generation task.
   def perform
     # Logic for generating PDF and sending email
     posts_created_after_12_pm = Post.where("created_at >= ?", Time.zone.now.beginning_of_day + 12.hours)
@@ -13,6 +16,7 @@ class DailyReportWorker
 
   private
 
+  # Generate a PDF report from the provided posts.
   def generate_pdf(posts)
     respond_to do |format|
       format.html
@@ -23,11 +27,12 @@ class DailyReportWorker
     end
   end
 
+  # Send an email with the PDF attachment.
   def send_email_with_pdf(pdf_data)
     @posts = Post.where("created_at >= ?", Time.zone.now.beginning_of_day)
 
     # Assuming you have a User model associated with posts
-    recipients = User.where(role:"admin").pluck(:email).join(',')
+    recipients = User.where(role: "admin").pluck(:email).join(',')
 
     UserMailer.daily_post_report(recipients, @posts).deliver_now
   end

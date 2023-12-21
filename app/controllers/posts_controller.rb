@@ -17,24 +17,29 @@ class PostsController < ApplicationController
     UserMailer.daily_post_report(recipients, @posts).deliver_now
   end
   def index
-    @posts = Post.all
-    respond_to do |format|
-      format.html
-      format.csv do
-        posts_created_before_12pm = Post.where('created_at < ?', Time.zone.today.beginning_of_day + 12.hours)
-        send_data posts_created_before_12pm.to_csv, filename: "posts_created_before_12pm-#{DateTime.now.strftime("%d%m%Y%H%M")}.csv"
-      end
-    end
-    @user = authenticate_user
-
-    if @user.role == "admin"
-      @posts = Post.all
-      render json: @posts
-    elsif @user.role == "user"
-      posts = @user.posts.all
-      render json: posts
+  respond_to do |format|
+    format.html
+    format.csv do
+      # Fetch posts created before 12 PM today
+      posts_created_before_12pm = Post.where('created_at < ?', Time.zone.today.beginning_of_day + 12.hours)
+      send_data posts_created_before_12pm.to_csv, filename: "posts_created_before_12pm-#{DateTime.now.strftime("%d%m%Y%H%M")}.csv"
     end
   end
+
+  # Authenticate the user
+  @user = authenticate_user
+
+  if @user.role == "admin"
+    # Fetch all posts for admin
+    @posts = Post.all
+    render json: @posts
+  elsif @user.role == "user"
+    # Fetch posts for a regular user
+    posts = @user.posts.all
+    render json: posts
+  end
+end
+
 
   # GET /posts/:id
   # Returns details of a specific post based on the user's role.
