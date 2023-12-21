@@ -17,7 +17,7 @@
 #   runner "AnotherModel.prune_old_records"
 # end
 every 2.minute  do
-  runner puts "jhgfffn"
+  runner puts "I am cronjob"
 end
 every 1.day, at: '1:00 am' do
   rake 'post_worker:send_csv'
@@ -27,6 +27,9 @@ every 1.day, at: '4:30 am' do
 end
 every 1.day, at: '12:30 pm' do
   rake "post:send_daily_report"
+end
+every 1.day, at: '12:05 pm' do
+  runner 'DailyReportWorker.perform_async'
 end
 # while true
 #   UserMailer.send_email
