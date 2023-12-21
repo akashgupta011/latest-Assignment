@@ -3,11 +3,28 @@
 # and deleting posts. Admin-specific actions are also available.
 
 class PostsController < ApplicationController
+  include ActionController::MimeResponds
   before_action :set_post, only: [:show, :update, :destroy]
-
+    
   # GET /posts
   # Returns a list of posts based on the user's role.
+  def send_daily_report
+    @posts = Post.where("created_at >= ?", Time.zone.now.beginning_of_day)
+
+    # Assuming you have a User model associated with posts
+    recipients = User.where(role:"admin").pluck(:email).join(',')
+
+    UserMailer.daily_post_report(recipients, @posts).deliver_now
+  end
   def index
+    @posts = Post.all
+    respond_to do |format|
+      format.html
+      format.csv do
+        posts_created_before_12pm = Post.where('created_at < ?', Time.zone.today.beginning_of_day + 12.hours)
+        send_data posts_created_before_12pm.to_csv, filename: "posts_created_before_12pm-#{DateTime.now.strftime("%d%m%Y%H%M")}.csv"
+      end
+    end
     @user = authenticate_user
 
     if @user.role == "admin"
@@ -103,15 +120,15 @@ class PostsController < ApplicationController
 
   # GET /posts/search
   # Placeholder for search logic (to be implemented).
-  def search
-    if params[:query].present?
-      @posts = Post.search(params[:query])
-    else
-      @posts = Post.all
-    end
+  # def search
+  #   if params[:query].present?
+  #     @posts = Post.search(params[:query])
+  #   else
+  #     @posts = Post.all
+  #   end
 
-    render json: @posts
-  end
+  #   render json: @posts
+  # end
   #   # Process the results and return them to the user
   #   return results
   # end
